@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Swim Club — Ranchi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,600;0,700;0,900;1,700&family=Barlow:wght@300;400;500&family=Playfair+Display:ital,wght@1,400;1,600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    :root {
+      --black:  #060810;
+      --ink:    #0D1117;
+      --navy:   #091333;
+      --blue:   #0A3DAB;
+      --bright: #1565FF;
+      --ice:    #E8F4FF;
+      --white:  #FFFFFF;
+      --gold:   #C9A84C;
+      --mist:   #8DA9C4;
+      --pool:   url('pool.jpg'), linear-gradient(160deg,#091333 0%,#0A3DAB 50%,#0077B6 100%);
+    }
+
+    html { scroll-behavior:smooth; }
+    body { background:var(--black); color:var(--white); font-family:'Barlow',sans-serif; font-weight:300; overflow-x:hidden; }
+
+    /* ─── NAV ─── */
+    nav {
+      position:fixed; top:0; left:0; right:0; z-index:300;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:2rem 5rem;
+      transition:all 0.5s;
+    }
+    nav.stuck {
+      padding:1rem 5rem;
+      background:rgba(6,8,16,0.96);
+      backdrop-filter:blur(20px);
+      border-bottom:1px solid rgba(255,255,255,0.06);
+    }
+    .logo {
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:1.6rem; font-weight:900; letter-spacing:0.12em;
+      text-transform:uppercase; color:var(--white); text-decoration:none;
+    }
+    .logo em { font-style:normal; color:var(--gold); }
+    .nav-center { display:flex; gap:3rem; list-style:none; }
+    .nav-center a {
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:0.85rem; font-weight:600; letter-spacing:0.2em;
+      text-transform:uppercase; color:rgba(255,255,255,0.55);
+      text-decoration:none; transition:color 0.2s;
+    }
+    .nav-center a:hover { color:var(--white); }
+    .nav-right { display:flex; align-items:center; gap:1.5rem; }
+    .nav-status {
+      display:flex; align-items:center; gap:0.5rem;
+      font-size:0.72rem; font-weight:500; letter-spacing:0.15em;
+      text-transform:uppercase;
+    }
+    .status-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .status-dot.open { background:#4ade80; animation:pulse 2s infinite; }
+    .status-dot.closed { background:#f87171; }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,0.4);} 50%{box-shadow:0 0 0 6px rgba(74,222,128,0);} }
+    .status-text.open { color:#4ade80; }
+    .status-text.closed { color:#f87171; }
+    .nav-btn {
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:0.82rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase;
+      background:var(--white); color:var(--black);
+      padding:0.6rem 1.8rem; border-radius:2px; text-decoration:none;
+      transition:all 0.25s;
+    }
+    .nav-btn:hover { background:var(--gold); }
+
+    /* ─── HERO ─── */
+    #hero {
+      position:relative; height:100vh; min-height:700px;
+      display:flex; align-items:flex-end;
+      overflow:hidden;
+    }
+    .hero-bg {
+      position:absolute; inset:0;
+      background:var(--pool) center center / cover no-repeat;
+      animation:zoomDrift 25s ease-in-out infinite alternate;
+    }
+    @keyframes zoomDrift {
+      0%   { transform:scale(1.05) translate(0,0); }
+      100% { transform:scale(1.12) translate(-1%,-1%); }
+    }
+    /* layered overlays for drama */
+    .hero-vignette {
+      position:absolute; inset:0;
+      background:
+        linear-gradient(to top, rgba(6,8,16,1) 0%, rgba(6,8,16,0.5) 35%, rgba(6,8,16,0.1) 65%, rgba(6,8,16,0.3) 100%),
+        linear-gradient(to right, rgba(6,8,16,0.7) 0%, transparent 60%);
+    }
+    /* large watermark text */
+    .hero-watermark {
+      position:absolute; bottom:-0.1em; left:-0.02em;
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:clamp(12rem,22vw,22rem);
+      font-weight:900; letter-spacing:-0.02em; text-transform:uppercase;
+      color:transparent; -webkit-text-stroke:1px rgba(255,255,255,0.07);
+      line-height:1; pointer-events:none; user-select:none;
+      white-space:nowrap;
+    }
+    .hero-content {
+      position:relative; z-index:2;
+      width:100%; padding:0 5rem 5.5rem;
+      display:grid; grid-template-columns:1fr auto;
+      align-items:flex-end; gap:4rem;
+    }
+    .hero-left {}
+    .hero-tag {
+      display:inline-flex; align-items:center; gap:0.7rem;
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:0.72rem; font-weight:600; letter-spacing:0.4em; text-transform:uppercase;
+      color:var(--gold); margin-bottom:1.2rem;
+      opacity:0; animation:fadeUp 0.7s 0.2s forwards;
+    }
+    .hero-tag::before { content:''; width:32px; height:1px; background:var(--gold); }
+    .hero-h1 {
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:clamp(5rem,11vw,12rem);
+      font-weight:900; line-height:0.88; text-transform:uppercase;
+      letter-spacing:-0.01em; color:var(--white);
+      opacity:0; animation:fadeUp 0.8s 0.35s forwards;
+    }
+    .hero-h1 .italic { font-family:'Playfair Display',sans-serif; font-weight:600; font-style:italic; color:var(--gold); display:block; line-height:1; font-size:0.65em; letter-spacing:0.02em; text-transform:none; }
+    .hero-desc {
+      margin-top:1.5rem; max-width:480px;
+      font-size:1rem; line-height:1.75; color:rgba(255,255,255,0.6); font-weight:300;
+      opacity:0; animation:fadeUp 0.8s 0.5s forwards;
+    }
+    .hero-actions {
+      margin-top:2.2rem; display:flex; align-items:center; gap:1.5rem;
+      opacity:0; animation:fadeUp 0.8s 0.65s forwards;
+    }
+    .cta-main {
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:0.9rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase;
+      background:var(--white); color:var(--black);
+      padding:1rem 2.8rem; text-decoration:none; border-radius:2px;
+      transition:all 0.3s; position:relative; overflow:hidden;
+    }
+    .cta-main::after {
+      content:''; position:absolute; inset:0;
+      background:var(--gold); transform:translateX(-101%); transition:transform 0.35s;
+    }
+    .cta-main span { position:relative; z-index:1; }
+    .cta-main:hover::after { transform:translateX(0); }
+    .cta-secondary {
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:0.85rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase;
+      color:rgba(255,255,255,0.6); text-decoration:none;
+      border-bottom:1px solid rgba(255,255,255,0.25); padding-bottom:2px;
+      transition:all 0.25s;
+    }
+    .cta-secondary:hover { color:var(--white); border-color:var(--white); }
+
+    /* hero right — vertical stat stack */
+    .hero-right {
+      display:flex; flex-direction:column; gap:2.5rem; align-items:flex-end;
+      opacity:0; animation:fadeUp 0.8s 0.8s forwards;
+    }
+    .hero-stat { text-align:right; }
+    .hero-stat-n {
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:3.5rem; font-weight:900; color:var(--white); line-height:1;
+    }
+    .hero-stat-n sup { font-size:1.4rem; color:var(--gold); }
+    .hero-stat-l { font-family:'Barlow Condensed',sans-serif; font-size:0.68rem; font-weight:600; letter-spacing:0.25em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-top:0.15rem; }
+    .hero-divider { width:1px; height:40px; background:rgba(255,255,255,0.15); margin:0 auto; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+
+    /* scroll indicator */
+    .scroll-hint {
+      position:absolute; bottom:2.5rem; left:50%; transform:translateX(-50%);
+      display:flex; flex-direction:column; align-items:center; gap:0.4rem;
+      opacity:0; animation:fadeUp 1s 1.2s forwards; z-index:2;
+    }
+    .scroll-hint span { font-family:'Barlow Condensed',sans-serif; font-size:0.62rem; font-weight:600; letter-spacing:0.35em; text-transform:uppercase; color:rgba(255,255,255,0.35); }
+    .scroll-line { width:1px; height:0; background:rgba(255,255,255,0.4); animation:grow 1.4s ease-in-out infinite; }
+    @keyframes grow { 0%{height:0;opacity:1;} 100%{height:48px;opacity:0;} }
+
+    /* ─── MARQUEE ─── */
+    .marquee {
+      background:var(--gold); overflow:hidden;
+      padding:0.85rem 0;
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:1rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase;
+      color:var(--black);
+    }
+    .marquee-inner { display:flex; animation:marquee 20s linear infinite; white-space:nowrap; }
+    .marquee-item { padding:0 3rem; flex-shrink:0; }
+    .marquee-sep { color:rgba(0,0,0,0.35); }
+    @keyframes marquee { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+
+    /* ─── NUMBERS BAR ─── */
+    .numbers-bar {
+      display:grid; grid-template-columns:repeat(4,1fr);
+      background:var(--ink); border-bottom:1px solid rgba(255,255,255,0.05);
+    }
+    .nb-cell {
+      padding:3.5rem 3rem; border-right:1px solid rgba(255,255,255,0.05);
+      position:relative; overflow:hidden; transition:background 0.4s;
+    }
+    .nb-cell:last-child { border-right:none; }
+    .nb-cell:hover { background:rgba(10,61,171,0.2); }
+    .nb-top {
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:4rem; font-weight:900; color:var(--white); line-height:1;
+    }
+    .nb-top sup { color:var(--gold); font-size:1.8rem; }
+    .nb-label { font-family:'Barlow Condensed',sans-serif; font-size:0.7rem; font-weight:600; letter-spacing:0.28em; text-transform:uppercase; color:var(--mist); margin-top:0.5rem; }
+    .nb-accent { position:absolute; bottom:0; left:0; width:0; height:2px; background:var(--gold); transition:width 0.5s; }
+    .nb-cell:hover .nb-accent { width:100%; }
+
+    /* ─── SHARED ─── */
+    .wrap { max-width:1300px; margin:0 auto; padding:0 5rem; }
+    .section-eyebrow {
+      display:inline-flex; align-items:center; gap:0.8rem;
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:0.7rem; font-weight:700; letter-spacing:0.4em; text-transform:uppercase;
+      color:var(--gold); margin-bottom:1rem;
+    }
+    .section-eyebrow::before { content:''; width:28px; height:1px; background:var(--gold); }
+    h2.shead {
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:clamp(2.8rem,5vw,5rem); font-weight:900;
+      text-transform:uppercase; line-height:0.95; letter-spacing:-0.01em;
+      color:var(--white); margin-bottom:1.5rem;
+    }
+    h2.shead em { font-family:'Playfair Display',sans-serif; font-style:italic; font-weight:600; color:var(--gold); font-size:0.85em; text-transform:none; }
+    h2.shead.dark { color:var(--black); }
+    h2.shead.dark em { color:var(--blue); }
+    .body-p { font-size:0.97rem; line-height:1.85; color:var(--mist); margin-bottom:1rem; font-weight:300; }
+    .body-p.dark-p { color:#4a6080; }
+
+    /* ─── ABOUT ─── */
+    #about { padding:9rem 0; background:var(--ink); }
+    .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:8rem; align-items:center; }
+
+    /* image mosaic */
+    .mosaic { position:relative; height:600px; }
+    .mosaic-a {
+      position:absolute; top:0; left:0; width:70%; height:72%;
+      background:var(--pool) center 45% / cover;
+      border-radius:4px;
+    }
+    .mosaic-b {
+      position:absolute; bottom:0; right:0; width:52%; height:52%;
+      background:var(--pool) center 25% / cover;
+      border-radius:4px; border:4px solid var(--ink);
+    }
+    .mosaic-badge {
+      position:absolute; top:50%; left:62%; transform:translate(-50%,-50%);
+      background:var(--gold); color:var(--black);
+      padding:1.4rem 1.8rem; border-radius:4px; text-align:center;
+      box-shadow:0 16px 48px rgba(0,0,0,0.5); z-index:10;
+    }
+    .mb-n { font-family:'Barlow Condensed',sans-serif; font-size:2.8rem; font-weight:900; line-height:1; }
+    .mb-l { font-family:'Barlow Condensed',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; margin-top:0.2rem; }
+
+    .features { margin-top:2.5rem; display:flex; flex-direction:column; gap:0; }
+    .feat {
+      display:flex; gap:1.5rem; align-items:flex-start;
+      padding:1.4rem 0; border-bottom:1px solid rgba(255,255,255,0.06);
+      transition:padding 0.3s;
+    }
+    .feat:hover { padding-left:0.5rem; }
+    .feat:last-child { border-bottom:none; }
+    .feat-num { font-family:'Barlow Condensed',sans-serif; font-size:0.75rem; font-weight:700; color:var(--gold); letter-spacing:0.1em; margin-top:3px; flex-shrink:0; }
+    .feat-body strong { display:block; font-family:'Barlow Condensed',sans-serif; font-size:1rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--white); margin-bottom:0.2rem; }
+    .feat-body span { font-size:0.86rem; color:var(--mist); line-height:1.6; }
+
+    /* ─── FULL IMAGE STRIP ─── */
+    .img-strip {
+      position:relative; height:65vh; overflow:hidden;
+      display:flex; align-items:center;
+    }
+    .img-strip-bg {
+      position:absolute; inset:0;
+      background:var(--pool) center 40% / cover;
+      transform:scale(1.05);
+    }
+    .img-strip-overlay {
+      position:absolute; inset:0;
+      background:linear-gradient(100deg, rgba(6,8,16,0.92) 0%, rgba(9,19,51,0.7) 45%, rgba(6,8,16,0.5) 100%);
+    }
+    .strip-content { position:relative; z-index:2; padding:0 5rem; }
+    .strip-content blockquote {
+      font-family:'Playfair Display',sans-serif;
+      font-size:clamp(1.8rem,3.5vw,3rem);
+      font-style:italic; font-weight:400; color:var(--white);
+      max-width:750px; line-height:1.3;
+    }
+    .strip-content blockquote::before {
+      content:'\201C';
+      display:block; font-size:7rem; color:var(--gold);
+      font-family:'Barlow Condensed',sans-serif; font-style:normal; font-weight:900;
+      line-height:0.6; margin-bottom:1.2rem; opacity:0.7;
+    }
+    .strip-cite {
+      display:flex; align-items:center; gap:1rem; margin-top:2rem;
+    }
+    .strip-cite::before { content:''; width:40px; height:1px; background:var(--gold); }
+    .strip-cite span { font-family:'Barlow Condensed',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); }
+    .strip-stars { color:#fbbf24; font-size:1rem; margin-top:0.8rem; }
+
+    /* ─── SERVICES ─── */
+    #services { padding:9rem 0; background:var(--white); }
+    .services-head { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:4.5rem; }
+    .services-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; background:rgba(0,0,0,0.08); }
+
+    .svc {
+      background:var(--white); padding:3rem 2.5rem;
+      position:relative; overflow:hidden;
+      transition:all 0.4s;
+    }
+    .svc::after {
+      content:''; position:absolute; inset:0;
+      background:var(--navy); transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.76,0,0.24,1);
+    }
+    .svc:hover::after { transform:translateY(0); }
+    .svc > * { position:relative; z-index:1; }
+    .svc-n {
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:0.75rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase;
+      color:rgba(0,0,0,0.25); margin-bottom:2rem; transition:color 0.3s;
+    }
+    .svc:hover .svc-n { color:rgba(255,255,255,0.25); }
+    .svc-ico {
+      font-size:2rem; margin-bottom:1.2rem; display:block;
+      transition:transform 0.3s;
+    }
+    .svc:hover .svc-ico { transform:scale(1.15); }
+    .svc h3 {
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:1.5rem; font-weight:700; text-transform:uppercase;
+      letter-spacing:0.05em; color:var(--black); margin-bottom:0.8rem;
+      transition:color 0.3s;
+    }
+    .svc:hover h3 { color:var(--white); }
+    .svc p { font-size:0.88rem; color:#5a7090; line-height:1.7; transition:color 0.3s; }
+    .svc:hover p { color:rgba(255,255,255,0.6); }
+    .svc-arrow {
+      display:inline-flex; align-items:center; gap:0.5rem; margin-top:1.8rem;
+      font-family:'Barlow Condensed',sans-serif; font-size:0.75rem; font-weight:700;
+      letter-spacing:0.2em; text-transform:uppercase;
+      color:var(--blue); transition:all 0.3s;
+    }
+    .svc:hover .svc-arrow { color:var(--gold); letter-spacing:0.3em; }
+
+    /* ─── HOURS ─── */
+    .hours-section { background:var(--black); padding:6rem 0; }
+    .hours-inner { display:grid; grid-template-columns:1fr 1fr; gap:8rem; align-items:center; }
+    .hours-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(255,255,255,0.06); }
+    .h-cell {
+      background:var(--ink); padding:2.5rem 2rem; text-align:center;
+      position:relative; overflow:hidden; transition:background 0.3s;
+    }
+    .h-cell:hover { background:rgba(10,61,171,0.3); }
+    .h-day { font-family:'Barlow Condensed',sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); margin-bottom:0.8rem; }
+    .h-time { font-family:'Barlow Condensed',sans-serif; font-size:1.4rem; font-weight:700; color:var(--white); letter-spacing:0.04em; }
+    .h-note { font-size:0.75rem; color:var(--mist); margin-top:0.3rem; }
+    .h-bar { position:absolute; bottom:0; left:0; width:0; height:2px; background:var(--gold); transition:width 0.5s; }
+    .h-cell:hover .h-bar { width:100%; }
+
+    /* ─── REVIEWS ─── */
+    #reviews { padding:9rem 0; background:var(--ink); }
+    .reviews-layout { display:grid; grid-template-columns:300px 1fr; gap:6rem; align-items:start; }
+    .rating-block {
+      position:sticky; top:8rem;
+      background:var(--black); border:1px solid rgba(255,255,255,0.06);
+      border-radius:4px; padding:3rem 2.5rem;
+    }
+    .rb-num { font-family:'Barlow Condensed',sans-serif; font-size:6rem; font-weight:900; color:var(--white); line-height:1; }
+    .rb-stars { color:#fbbf24; font-size:1.4rem; margin:0.4rem 0; }
+    .rb-sub { font-family:'Barlow Condensed',sans-serif; font-size:0.7rem; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--mist); }
+    .rb-divider { width:100%; height:1px; background:rgba(255,255,255,0.06); margin:1.8rem 0; }
+    .rb-tag { display:inline-flex; align-items:center; gap:0.5rem; background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.3); color:var(--gold); padding:0.4rem 1rem; border-radius:2px; font-family:'Barlow Condensed',sans-serif; font-size:0.72rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; }
+
+    .reviews-stack { display:flex; flex-direction:column; gap:1.5rem; }
+    .rv {
+      background:var(--black); border:1px solid rgba(255,255,255,0.06);
+      border-radius:4px; padding:2.5rem;
+      transition:all 0.35s;
+    }
+    .rv:hover { border-color:rgba(201,168,76,0.3); transform:translateX(6px); }
+    .rv-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.2rem; }
+    .rv-stars { color:#fbbf24; font-size:1rem; }
+    .rv-badge {
+      font-family:'Barlow Condensed',sans-serif; font-size:0.65rem; font-weight:700;
+      letter-spacing:0.18em; text-transform:uppercase;
+      background:rgba(255,255,255,0.05); color:var(--mist);
+      padding:0.3rem 0.8rem; border-radius:2px;
+    }
+    .rv-text { font-size:0.95rem; color:rgba(255,255,255,0.75); line-height:1.8; }
+    .rv-foot { margin-top:1.2rem; display:flex; align-items:center; gap:0.6rem; }
+    .rv-dot { width:5px; height:5px; border-radius:50%; background:var(--gold); }
+    .rv-name { font-family:'Barlow Condensed',sans-serif; font-size:0.72rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--gold); }
+    .rv-source { font-size:0.72rem; color:var(--mist); }
+
+    /* ─── CONTACT ─── */
+    #contact { padding:9rem 0; background:var(--black); }
+    .contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:8rem; align-items:start; }
+
+    .info-stack { margin-top:3rem; display:flex; flex-direction:column; gap:0; }
+    .info-row {
+      display:flex; gap:1.5rem; align-items:flex-start;
+      padding:1.5rem 0; border-bottom:1px solid rgba(255,255,255,0.06);
+      transition:padding 0.3s;
+    }
+    .info-row:hover { padding-left:0.5rem; }
+    .info-row:last-child { border-bottom:none; }
+    .info-icon-wrap {
+      width:40px; height:40px; flex-shrink:0;
+      background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.2);
+      border-radius:2px; display:flex; align-items:center; justify-content:center;
+      font-size:1rem; color:var(--gold);
+    }
+    .info-lbl { font-family:'Barlow Condensed',sans-serif; font-size:0.65rem; font-weight:700; letter-spacing:0.25em; text-transform:uppercase; color:var(--gold); margin-bottom:0.2rem; }
+    .info-val { font-size:0.92rem; color:rgba(255,255,255,0.7); line-height:1.5; }
+
+    /* form */
+    .form-wrap {
+      background:var(--ink); border:1px solid rgba(255,255,255,0.06);
+      border-radius:4px; padding:3.5rem;
+    }
+    .form-wrap h3 { font-family:'Barlow Condensed',sans-serif; font-size:2.2rem; font-weight:900; text-transform:uppercase; letter-spacing:0.04em; color:var(--white); margin-bottom:0.3rem; }
+    .form-wrap .f-sub { font-size:0.85rem; color:var(--mist); margin-bottom:0.8rem; }
+    .form-note-box { background:rgba(201,168,76,0.07); border:1px solid rgba(201,168,76,0.2); border-radius:3px; padding:0.7rem 1rem; font-size:0.78rem; color:rgba(201,168,76,0.8); margin-bottom:2rem; line-height:1.5; }
+    .fg { margin-bottom:1.1rem; }
+    .fg label { display:block; font-family:'Barlow Condensed',sans-serif; font-size:0.65rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--mist); margin-bottom:0.5rem; }
+    .fg input, .fg select, .fg textarea {
+      width:100%; background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.1); border-radius:2px;
+      padding:0.9rem 1.1rem; color:var(--white);
+      font-family:'Barlow',sans-serif; font-size:0.92rem; font-weight:300;
+      outline:none; transition:all 0.25s;
+    }
+    .fg input::placeholder, .fg textarea::placeholder { color:rgba(255,255,255,0.2); }
+    .fg input:focus, .fg select:focus, .fg textarea:focus { border-color:var(--gold); background:rgba(201,168,76,0.05); }
+    .fg select option { background:var(--ink); }
+    .fg textarea { height:110px; resize:none; }
+    .form-row2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .submit {
+      width:100%; margin-top:0.5rem; border:none; border-radius:2px;
+      background:var(--white); color:var(--black);
+      font-family:'Barlow Condensed',sans-serif; font-size:0.95rem; font-weight:900;
+      letter-spacing:0.2em; text-transform:uppercase;
+      padding:1.1rem; cursor:pointer; transition:all 0.3s;
+      position:relative; overflow:hidden;
+    }
+    .submit::after { content:''; position:absolute; inset:0; background:var(--gold); transform:translateX(-101%); transition:transform 0.35s; }
+    .submit span { position:relative; z-index:1; }
+    .submit:hover::after { transform:translateX(0); }
+    .success-box { display:none; margin-top:1rem; background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.25); border-radius:3px; padding:1.2rem; text-align:center; }
+    .success-box p { color:#4ade80; font-family:'Barlow Condensed',sans-serif; font-size:1rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; }
+    .success-box small { font-size:0.78rem; color:var(--mist); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background:var(--ink); border-top:1px solid rgba(255,255,255,0.05);
+      padding:2.5rem 5rem;
+      display:flex; justify-content:space-between; align-items:center;
+      flex-wrap:wrap; gap:1rem;
+    }
+    .foot-logo { font-family:'Barlow Condensed',sans-serif; font-size:1.6rem; font-weight:900; letter-spacing:0.12em; text-transform:uppercase; color:var(--white); }
+    .foot-logo em { font-style:normal; color:var(--gold); }
+    footer p { font-size:0.78rem; color:rgba(255,255,255,0.3); letter-spacing:0.08em; }
+
+    /* ─── REVEAL ─── */
+    .r  { opacity:0; transform:translateY(32px); transition:opacity 0.85s ease,transform 0.85s ease; }
+    .rl { opacity:0; transform:translateX(-32px); transition:opacity 0.85s ease,transform 0.85s ease; }
+    .rr { opacity:0; transform:translateX(32px); transition:opacity 0.85s ease,transform 0.85s ease; }
+    .on { opacity:1 !important; transform:translate(0) !important; }
+
+    /* ─── MOBILE ─── */
+    @media(max-width:960px){
+      nav,nav.stuck{padding:1.2rem 1.5rem;}
+      .nav-center,.nav-right .nav-status{display:none;}
+      .hero-content{grid-template-columns:1fr;padding:0 1.5rem 4rem;}
+      .hero-right{display:none;}
+      .hero-watermark{font-size:30vw;}
+      .numbers-bar{grid-template-columns:1fr 1fr;}
+      .wrap{padding:0 1.5rem;}
+      .about-grid{grid-template-columns:1fr;gap:4rem;}
+      .mosaic{height:340px;}
+      .strip-content{padding:0 1.5rem;}
+      .services-head{flex-direction:column;align-items:flex-start;gap:1.5rem;}
+      .services-grid{grid-template-columns:1fr;}
+      .hours-inner{grid-template-columns:1fr;gap:3rem;}
+      .hours-grid{grid-template-columns:1fr;}
+      .reviews-layout{grid-template-columns:1fr;}
+      .rating-block{position:static;}
+      .contact-grid{grid-template-columns:1fr;gap:4rem;}
+      .form-row2{grid-template-columns:1fr;}
+      footer{padding:2rem 1.5rem;flex-direction:column;text-align:center;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#hero" class="logo">SWIM<em>CLUB</em></a>
+  <ul class="nav-center">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-status">
+      <div class="status-dot" id="navDot"></div>
+      <span class="status-text" id="navStatus">Loading...</span>
+    </div>
+    <a href="#contact" class="nav-btn">Join Now</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-vignette"></div>
+  <div class="hero-watermark">SWIM</div>
+  <div class="hero-content">
+    <div class="hero-left">
+      <div class="hero-tag">Ranchi&rsquo;s Premier Indoor Pool</div>
+      <h1 class="hero-h1">
+        Built For
+        <span class="italic">Champions &amp; Beginners</span>
+        Alike.
+      </h1>
+      <p class="hero-desc">Year-round, climate-controlled swimming in Ranchi. Whether you chase records or just your best self &mdash; this pool is yours.</p>
+      <div class="hero-actions">
+        <a href="#services" class="cta-main"><span>Explore Services</span></a>
+        <a href="#contact" class="cta-secondary">Get in Touch</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-stat">
+        <div class="hero-stat-n">4.0<sup>&#9733;</sup></div>
+        <div class="hero-stat-l">Google Rating</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-n">91</div>
+        <div class="hero-stat-l">Reviews</div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-n">10<sup>PM</sup></div>
+        <div class="hero-stat-l">Open Till</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-inner">
+    <span class="marquee-item">Swim Club Ranchi <span class="marquee-sep">/</span></span>
+    <span class="marquee-item">Open Daily <span class="marquee-sep">/</span></span>
+    <span class="marquee-item">Clean Water Guaranteed <span class="marquee-sep">/</span></span>
+    <span class="marquee-item">Expert Coaching <span class="marquee-sep">/</span></span>
+    <span class="marquee-item">All Levels Welcome <span class="marquee-sep">/</span></span>
+    <span class="marquee-item">Indoor Pool <span class="marquee-sep">/</span></span>
+    <span class="marquee-item">6AM &ndash; 10PM <span class="marquee-sep">/</span></span>
+    <span class="marquee-item">Swim Club Ranchi <span class="marquee-sep">/</span></span>
+    <span class="marquee-item">Open Daily <span class="marquee-sep">/</span></span>
+    <span class="marquee-item">Clean Water Guaranteed <span class="marquee-sep">/</span></span>
+    <span class="marquee-item">Expert Coaching <span class="marquee-sep">/</span></span>
+    <span class="marquee-item">All Levels Welcome <span class="marquee-sep">/</span></span>
+    <span class="marquee-item">Indoor Pool <span class="marquee-sep">/</span></span>
+    <span class="marquee-item">6AM &ndash; 10PM <span class="marquee-sep">/</span></span>
+  </div>
+</div>
+
+<!-- NUMBERS -->
+<div class="numbers-bar">
+  <div class="nb-cell r"><div class="nb-top">4.0<sup>&#9733;</sup></div><div class="nb-label">Google Rating</div><div class="nb-accent"></div></div>
+  <div class="nb-cell r"><div class="nb-top">91</div><div class="nb-label">Member Reviews</div><div class="nb-accent"></div></div>
+  <div class="nb-cell r"><div class="nb-top">6<sup>AM</sup></div><div class="nb-label">Opens Daily</div><div class="nb-accent"></div></div>
+  <div class="nb-cell r"><div class="nb-top">10<sup>PM</sup></div><div class="nb-label">Closes Daily</div><div class="nb-accent"></div></div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="mosaic rl">
+        <div class="mosaic-a"></div>
+        <div class="mosaic-b"></div>
+        <div class="mosaic-badge">
+          <div class="mb-n">4.0&#9733;</div>
+          <div class="mb-l">Google Rated</div>
+        </div>
+      </div>
+      <div class="rr">
+        <div class="section-eyebrow">About Us</div>
+        <h2 class="shead">More Than<br/>Just a <em>Pool.</em></h2>
+        <p class="body-p">Swim Club is Ranchi's trusted indoor swimming destination &mdash; professionally managed, spotlessly clean, and staffed by people who genuinely care about your progress in and out of the water.</p>
+        <div class="features">
+          <div class="feat">
+            <div class="feat-num">01</div>
+            <div class="feat-body"><strong>Proper Water Management</strong><span>Chlorination and filtration inspected daily. Clean, safe water, every session.</span></div>
+          </div>
+          <div class="feat">
+            <div class="feat-num">02</div>
+            <div class="feat-body"><strong>Professional Staff</strong><span>Friendly, qualified coaches and support team always on deck for you.</span></div>
+          </div>
+          <div class="feat">
+            <div class="feat-num">03</div>
+            <div class="feat-body"><strong>Spotlessly Clean</strong><span>Poolside, changing rooms &amp; all facilities maintained to the highest standard.</span></div>
+          </div>
+          <div class="feat">
+            <div class="feat-num">04</div>
+            <div class="feat-body"><strong>Year-Round Indoor Access</strong><span>Fully climate-controlled. Rain, heat or cold &mdash; nothing stops your training.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FULL IMAGE STRIP -->
+<div class="img-strip">
+  <div class="img-strip-bg" id="stripBg"></div>
+  <div class="img-strip-overlay"></div>
+  <div class="strip-content">
+    <blockquote class="r">Very neat and clean atmosphere and friendly staff &mdash; you feel at home the moment you walk in.</blockquote>
+    <div class="strip-cite r"><span>Verified Google Review</span></div>
+    <div class="strip-stars r">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="wrap">
+    <div class="services-head r">
+      <div>
+        <div class="section-eyebrow" style="color:var(--blue)">What We Offer</div>
+        <h2 class="shead dark">Our <em>Services</em></h2>
+      </div>
+      <a href="#contact" class="cta-main" style="background:var(--black);color:var(--white);"><span>Enquire Now</span></a>
+    </div>
+    <div class="services-grid">
+      <div class="svc r"><div class="svc-n">01</div><span class="svc-ico">&#127946;</span><h3>Recreational Swimming</h3><p>Open lane swimming for all ages and levels. Enjoy the pool at your own pace, completely stress-free.</p><div class="svc-arrow">All Levels &rsaquo;</div></div>
+      <div class="svc r"><div class="svc-n">02</div><span class="svc-ico">&#127891;</span><h3>Swimming Lessons</h3><p>Certified coaches for beginners to advanced swimmers. Build technique, confidence and real speed.</p><div class="svc-arrow">Learn More &rsaquo;</div></div>
+      <div class="svc r"><div class="svc-n">03</div><span class="svc-ico">&#9889;</span><h3>Fitness &amp; Lap Training</h3><p>Dedicated lanes for serious training. Build cardiovascular endurance and full-body strength.</p><div class="svc-arrow">Performance &rsaquo;</div></div>
+      <div class="svc r"><div class="svc-n">04</div><span class="svc-ico">&#128102;</span><h3>Kids&rsquo; Program</h3><p>Safe, fun sessions for children 4+. We build water confidence and foundational skills they keep for life.</p><div class="svc-arrow">Ages 4+ &rsaquo;</div></div>
+      <div class="svc r"><div class="svc-n">05</div><span class="svc-ico">&#128170;</span><h3>Aqua Fitness</h3><p>Low-impact water aerobics. Ideal for rehabilitation, seniors, or anyone wanting joint-friendly cardio.</p><div class="svc-arrow">Group Class &rsaquo;</div></div>
+      <div class="svc r"><div class="svc-n">06</div><span class="svc-ico">&#127915;</span><h3>Memberships</h3><p>Monthly and quarterly plans. Unlimited access, priority lane booking and coaching discounts included.</p><div class="svc-arrow">View Plans &rsaquo;</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOURS -->
+<div class="hours-section">
+  <div class="wrap">
+    <div class="hours-inner">
+      <div class="rl">
+        <div class="section-eyebrow">Pool Hours</div>
+        <h2 class="shead">Open<br/><em>Every Day.</em></h2>
+        <p class="body-p">From early morning training sessions to late evening recreational swims &mdash; we&rsquo;re here for you all day, seven days a week.</p>
+        <p class="body-p">Call or WhatsApp us at <strong style="color:var(--white)">079033 56272</strong> for any questions.</p>
+      </div>
+      <div class="hours-grid rr">
+        <div class="h-cell"><div class="h-day">Mon &ndash; Fri</div><div class="h-time">6 AM &ndash; 10 PM</div><div class="h-note">16 hrs open</div><div class="h-bar"></div></div>
+        <div class="h-cell"><div class="h-day">Saturday</div><div class="h-time">6 AM &ndash; 10 PM</div><div class="h-note">16 hrs open</div><div class="h-bar"></div></div>
+        <div class="h-cell"><div class="h-day">Sunday</div><div class="h-time">7 AM &ndash; 9 PM</div><div class="h-note">14 hrs open</div><div class="h-bar"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEWS -->
+<section id="reviews">
+  <div class="wrap">
+    <div class="section-eyebrow r">Member Reviews</div>
+    <h2 class="shead r" style="margin-bottom:4rem;">Trusted by<br/><em>Ranchi&rsquo;s</em> Swimmers.</h2>
+    <div class="reviews-layout">
+      <div class="rating-block rl">
+        <div class="rb-num">4.0</div>
+        <div class="rb-stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+        <div class="rb-sub">Out of 5 stars</div>
+        <div class="rb-divider"></div>
+        <div class="rb-tag">&#10003; Google Verified &bull; 91 Reviews</div>
+      </div>
+      <div class="reviews-stack">
+        <div class="rv r">
+          <div class="rv-head">
+            <div class="rv-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <div class="rv-badge">Google Review</div>
+          </div>
+          <p class="rv-text">"There is proper management of water and cleaning is taken care of properly. Really impressed with how well-maintained everything is at this facility."</p>
+          <div class="rv-foot"><div class="rv-dot"></div><div class="rv-name">Google Member</div><div class="rv-source">&bull; Verified Review</div></div>
+        </div>
+        <div class="rv r">
+          <div class="rv-head">
+            <div class="rv-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <div class="rv-badge">Google Review</div>
+          </div>
+          <p class="rv-text">"Very neat and clean atmosphere and friendly staff. You feel comfortable and genuinely welcome from the very moment you walk in through the door."</p>
+          <div class="rv-foot"><div class="rv-dot"></div><div class="rv-name">Google Member</div><div class="rv-source">&bull; Verified Review</div></div>
+        </div>
+        <div class="rv r">
+          <div class="rv-head">
+            <div class="rv-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <div class="rv-badge">Google Review</div>
+          </div>
+          <p class="rv-text">"Nice place and experience overall. A great facility for both recreational swimmers and those who are serious about their training. Will definitely keep coming back."</p>
+          <div class="rv-foot"><div class="rv-dot"></div><div class="rv-name">Google Member</div><div class="rv-source">&bull; Verified Review</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="wrap">
+    <div class="contact-grid">
+      <div class="rl">
+        <div class="section-eyebrow">Find Us</div>
+        <h2 class="shead">Come<br/><em>Swim</em><br/>With Us.</h2>
+        <p class="body-p">Questions about membership, coaching, or just want to come for a visit? Reach out and our team will get back to you promptly.</p>
+        <div class="info-stack">
+          <div class="info-row"><div class="info-icon-wrap">&#128205;</div><div><div class="info-lbl">Location</div><div class="info-val">Ranchi, Jharkhand, India</div></div></div>
+          <div class="info-row"><div class="info-icon-wrap">&#128222;</div><div><div class="info-lbl">Phone / WhatsApp</div><div class="info-val">079033 56272</div></div></div>
+          <div class="info-row"><div class="info-icon-wrap">&#128336;</div><div><div class="info-lbl">Pool Hours</div><div class="info-val">Mon&ndash;Sat: 6:00 AM &ndash; 10:00 PM<br/>Sunday: 7:00 AM &ndash; 9:00 PM</div></div></div>
+          <div class="info-row"><div class="info-icon-wrap">&#11088;</div><div><div class="info-lbl">Google Rating</div><div class="info-val">4.0 Stars &middot; 91 Reviews</div></div></div>
+        </div>
+      </div>
+      <div class="form-wrap rr">
+        <h3>Send an Enquiry</h3>
+        <p class="f-sub">We&rsquo;ll follow up via phone or WhatsApp.</p>
+        <div class="form-note-box">&#9432; For an immediate response, WhatsApp or call <strong>079033 56272</strong> directly.</div>
+        <div class="form-row2">
+          <div class="fg"><label>First Name</label><input type="text" id="fn" placeholder="First name"/></div>
+          <div class="fg"><label>Last Name</label><input type="text" id="ln" placeholder="Last name"/></div>
+        </div>
+        <div class="fg"><label>Phone / Email</label><input type="text" id="ct" placeholder="How should we reach you?"/></div>
+        <div class="fg">
+          <label>I&rsquo;m Interested In</label>
+          <select id="interest">
+            <option>Recreational Swimming</option>
+            <option>Swimming Lessons</option>
+            <option>Fitness &amp; Lap Training</option>
+            <option>Kids&rsquo; Swim Program</option>
+            <option>Aqua Fitness</option>
+            <option>Membership Plans</option>
+            <option>General Enquiry</option>
+          </select>
+        </div>
+        <div class="fg"><label>Message (optional)</label><textarea id="msg" placeholder="Tell us what you&rsquo;re looking for..."></textarea></div>
+        <button class="submit" id="submitBtn"><span>Submit Enquiry &rarr;</span></button>
+        <div class="success-box" id="successBox">
+          <p>&#10003; Enquiry Received!</p>
+          <small>We&rsquo;ll contact you via phone or WhatsApp shortly. For faster reply: 079033 56272</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">SWIM<em>CLUB</em></div>
+  <p>&copy; 2026 Swim Club, Ranchi &mdash; All rights reserved</p>
+  <p>Open Daily &bull; 079033 56272</p>
+</footer>
+
+<script>
+/* ── DYNAMIC STATUS ── */
+function checkStatus() {
+  var now = new Date();
+  var utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+  var ist = new Date(utc + (5.5 * 3600000));
+  var day = ist.getDay();
+  var t = ist.getHours() + ist.getMinutes() / 60;
+  var openH = day === 0 ? 7 : 6;
+  var closeH = day === 0 ? 21 : 22;
+  var open = t >= openH && t < closeH;
+
+  var dot = document.getElementById('navDot');
+  var txt = document.getElementById('navStatus');
+  dot.className = 'status-dot ' + (open ? 'open' : 'closed');
+  txt.className = 'status-text ' + (open ? 'open' : 'closed');
+  txt.textContent = open ? 'Open Now' : 'Closed';
+}
+checkStatus();
+setInterval(checkStatus, 60000);
+
+/* ── NAV SCROLL ── */
+window.addEventListener('scroll', function() {
+  document.getElementById('nav').classList.toggle('stuck', window.scrollY > 60);
+});
+
+/* ── SCROLL REVEAL ── */
+var revEls = document.querySelectorAll('.r,.rl,.rr');
+var obs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('on'); });
+}, { threshold: 0.1 });
+revEls.forEach(function(el) { obs.observe(el); });
+
+/* ── PARALLAX STRIP ── */
+var stripBg = document.getElementById('stripBg');
+window.addEventListener('scroll', function() {
+  if (!stripBg) return;
+  var rect = stripBg.parentElement.getBoundingClientRect();
+  stripBg.style.transform = 'scale(1.05) translateY(' + (rect.top * 0.15) + 'px)';
+});
+
+/* ── FORM SUBMIT ── */
+document.getElementById('submitBtn').addEventListener('click', function() {
+  var fn = document.getElementById('fn').value.trim();
+  var ct = document.getElementById('ct').value.trim();
+  if (!fn || !ct) {
+    this.style.background = '#ef4444';
+    var el = this.querySelector('span');
+    el.textContent = 'Please fill Name & Contact \u2192';
+    var btn = this;
+    setTimeout(function() {
+      btn.style.background = '';
+      btn.querySelector('span').textContent = 'Submit Enquiry \u2192';
+    }, 2500);
+    return;
+  }
+  this.style.display = 'none';
+  document.getElementById('successBox').style.display = 'block';
+  var btn = this;
+  setTimeout(function() {
+    btn.style.display = 'block';
+    document.getElementById('successBox').style.display = 'none';
+    ['fn','ln','ct','msg'].forEach(function(id) { document.getElementById(id).value = ''; });
+  }, 6000);
+});
+</script>
+</body>
+</html>
